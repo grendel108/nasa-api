@@ -1,16 +1,16 @@
 // ADDITIONAL FUNCTIONS
-// 1. Add button to load image rather than page load.
-// 2. Add a textbox to ask for date and return that APOD.
+// DONE. 1. Add button to load image rather than page load.
+// DONE. 2. Add a textbox to ask for date and return that APOD.
 // 3. Connect Firebase to log each APOD that is loaded with the date as Key.
 
 
 // Verify that JS file loaded.
 console.log("JS file has loaded.");
 
-
+//////////////////// GLOBAL VARIABLES ///////////////////////////////
 // Get HTML elements as JS variables to display APOD.
 let titleAPODElem = document.getElementById("title");
-let dateAPODElem = document.getElementById("date");
+let dateAPODElem = document.getElementById("dateAPOD");
 let displayAPODElem = document.getElementById("apod");
 let explainAPODElem = document.getElementById("explanation");
 let submitElem = document.getElementById("submitAPODDate");
@@ -18,9 +18,18 @@ let submitElem = document.getElementById("submitAPODDate");
 // API key. Add date parameter to get past APOD. Concatenate this with date parameter if user submits a date.
 let url = "https://api.nasa.gov/planetary/apod?api_key=MZzdiyAR2POTssNKcTtkmmrZiQWV1pXrZXcAuCIc";
 
-// Request APOD as JSON and then display the APOD.
+/////////////////////////////////////////////////////////////////////
+
+
+
+
+// On page load, display today's APOD.
 getAPOD(url, displayAPOD);
-getAPOD(url, myFunction);
+
+// If user inputs a prior date, get prior date APOD.
+submitElem.addEventListener("click", handleClick);
+
+
 
 
 //////////////////////  FUNCTION DEFINITIONS  ///////////////////////
@@ -28,7 +37,8 @@ function getAPOD(url, callback) {
     let requestObject = new XMLHttpRequest();
     requestObject.addEventListener("load", function () {
         // Callback function--displayAPOD()--is now invoked within getAPOD(), which is the containing function.
-        callback(requestObject.response);
+        // The callback funtion is simply receiving the response as an argument. I can then define what to do with that response in the callback function's definiton.
+        callback(requestObject.response);  
         console.log("handleResponse() example");
         console.log(requestObject.response);
     })
@@ -59,9 +69,23 @@ function displayAPOD(response) {
 
 }
 
-// Pass a different callback function to getAPOD().
-function myFunction(x) {
-    console.log("Testing another callback function.");
-    console.log(JSON.parse(x).copyright);
+
+function handleClick() {
+    let priorDateAPODElem = document.getElementById("priorDateAPOD");
+    let priorDateAPOD = priorDateAPODElem.value;
+    let priorDateURL = url + "&date=" + priorDateAPOD;
+    let d = new Date();
+    // This is returning month and day without a leading zero, which is what the api date parameter requires. Cannot check bad date this way. Server returns error message in JSON. Maybe use that to handle error.
+    let today = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+
+    if(priorDateAPOD >= today) {
+        console.log("Bad date.")
+    } else {
+        getAPOD(priorDateURL, displayAPOD);
+    }
+    
 }
+
+
+
 /////////////////////////////////////////////////////////////////////
